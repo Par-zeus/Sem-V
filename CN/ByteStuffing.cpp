@@ -1,51 +1,64 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-string encodingbyte(const string &input) {
-    string output = "FLAG"; 
-    size_t i = 0;
-
-    while (i < input.size()) {
-        if (input.substr(i, 4) == "FLAG" || input.substr(i, 3) == "ESC") {
-            output += "ESC";
-            output += input.substr(i, input.substr(i, 4) == "FLAG" ? 4 : 3);
-            i += (input.substr(i, 4) == "FLAG" ? 4 : 3);
+static void receiver(const string& messageSent) {
+    int flag = 0;
+    bool esc = false;
+    char ch;
+    int i = 0;
+    while (i < messageSent.length()) {
+        ch = messageSent[i];
+        if (esc) {
+            cout << ch;
+            esc = false;
+        } else if (ch == '$') {
+            if (flag == 0) flag = 1; // Start of a frame
+            else {
+                flag = 0; // End of a frame
+                cout << endl;
+            }
+        } else if (ch == '#') {
+            esc = true; // ESC character found, escape the next character
         } else {
-            output += input[i];
-            i++;
+            cout << ch; // Normal character, print it
         }
+        i++;
     }
-
-    output += "FLAG"; 
-    return output;
-}
-
-string decodingbyte(const string &input) {
-    string output;
-    bool escape = false;
-
-    for (int i = 4; i < input.size() - 4; ++i) { // Skip the FLAG at the start and end
-        if (escape) {
-            output += input[i];
-            escape = false;
-        } else if (input.substr(i, 3) == "ESC") {
-            escape = true;
-            i += 2; 
-        } else {
-            output += input[i];
-        }
-    }
-
-    return output;
 }
 
 int main() {
-    string data = "FLAG A FLAG C FLAG";
-    string encoded = encodingbyte(data);
-    string decoded = decodingbyte(encoded);
+        string messageSent = "";
+        cout << "Enter number of frames: ";
+        int frames;
+        cin >> frames;
 
-    cout << "Encoded: " << encoded << endl;
-    cout << "Decoded: " << decoded << endl;
+        vector<string> s(frames);
+        cout << "Enter the frames:\n";
+        for (int i = 0; i < frames; i++) {
+            cin >> s[i];
 
-    return 0;
-}
+            // Perform byte stuffing
+            int pos = 0;
+            while ((pos = s[i].find("#", pos)) != string::npos) {
+                s[i].replace(pos, 1, "##"); // Replace # with ##
+                pos += 2;
+            }
+            pos = 0;
+            while ((pos = s[i].find("$", pos)) != string::npos) {
+                s[i].replace(pos, 1, "#$"); // Replace $ with #$
+                pos += 2;
+            }
+
+            // Add start and end flag $
+            s[i] = "$" + s[i] + "$";
+        }
+
+        for (int i = 0; i < frames; i++) {
+            messageSent += s[i];
+        }
+        cout << "\nEncoded message:\n" << messageSent << endl;
+
+        cout << "\nReceiver output:\n";
+        receiver(messageSent);
+        return 0;
+    }
