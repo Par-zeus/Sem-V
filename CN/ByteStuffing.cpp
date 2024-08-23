@@ -1,13 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
+
 string encodingbyte(const string &input) {
     string output = "FLAG"; 
-    for (char c : input) {
-        if (c == 'FLAG' || c == 'ESC') {
+    size_t i = 0;
+
+    while (i < input.size()) {
+        if (input.substr(i, 4) == "FLAG" || input.substr(i, 3) == "ESC") {
             output += "ESC";
+            output += input.substr(i, input.substr(i, 4) == "FLAG" ? 4 : 3);
+            i += (input.substr(i, 4) == "FLAG" ? 4 : 3);
+        } else {
+            output += input[i];
+            i++;
         }
-        output += c;
     }
+
     output += "FLAG"; 
     return output;
 }
@@ -15,7 +23,8 @@ string encodingbyte(const string &input) {
 string decodingbyte(const string &input) {
     string output;
     bool escape = false;
-    for (size_t i = 4; i < input.size() - 4; ++i) { // Skip the FLAG at the start and end
+
+    for (int i = 4; i < input.size() - 4; ++i) { // Skip the FLAG at the start and end
         if (escape) {
             output += input[i];
             escape = false;
@@ -26,11 +35,12 @@ string decodingbyte(const string &input) {
             output += input[i];
         }
     }
+
     return output;
 }
 
 int main() {
-    string data = "HELLO";
+    string data = "FLAG A FLAG C FLAG";
     string encoded = encodingbyte(data);
     string decoded = decodingbyte(encoded);
 
