@@ -1,0 +1,101 @@
+% Family facts
+% Format: parent(Child, Parent).
+parent(john, michael).      % John is the child of Michael
+parent(john, sarah).        % John is the child of Sarah
+parent(emily, michael).     % Emily is the child of Michael
+parent(emily, sarah).       % Emily is the child of Sarah
+parent(michael, robert).    % Michael is the child of Robert
+parent(michael, linda).     % Michael is the child of Linda
+parent(sarah, david).       % Sarah is the child of David
+parent(sarah, elizabeth).   % Sarah is the child of Elizabeth
+parent(david, james).       % David is the child of James
+parent(david, rachel).      % David is the child of Rachel
+parent(elizabeth, charles). % Elizabeth is the child of Charles
+parent(elizabeth, helen).   % Elizabeth is the child of Helen
+
+% Gender facts
+male(michael).
+male(john).
+male(robert).
+male(david).
+male(james).
+male(charles).
+
+female(sarah).
+female(emily).
+female(linda).
+female(elizabeth).
+female(rachel).
+female(helen).
+
+% Defining relationships
+
+% Grandfather
+grandfather(Grandchild, Grandfather) :-
+    grandparent(Grandchild, Grandfather),
+    male(Grandfather).
+
+% Grandmother
+grandmother(Grandchild, Grandmother) :-
+    grandparent(Grandchild, Grandmother),
+    female(Grandmother).
+
+% Mother
+mother(Mother, Child) :-
+    parent(Child, Mother),
+    female(Mother).
+
+% Father
+father(Father, Child) :-
+    parent(Child, Father),
+    male(Father).
+
+% Sibling
+sibling(X, Y) :-
+    parent(X, P),
+    parent(Y, P),
+    X \= Y.
+
+% Brother
+brother(Brother, Sibling) :-
+    male(Brother),
+    sibling(Brother, Sibling).
+
+% Sister
+sister(Sister, Sibling) :-
+    female(Sister),
+    sibling(Sister, Sibling).
+
+
+% Son
+son(Son, Parent) :-
+    parent(Son, Parent),
+    male(Son).
+
+% Daughter
+daughter(Daughter, Parent) :-
+    parent(Daughter, Parent),
+    female(Daughter).
+
+% Uncle
+uncle(Uncle, Nephew) :-
+    sibling(Uncle, Parent),
+    parent(Nephew, Parent),
+    male(Uncle).
+
+% Aunt
+aunt(Aunt, Niece) :-
+    sibling(Aunt, Parent),
+    parent(Niece, Parent),
+    female(Aunt).
+
+% Cousin
+cousin(Cousin, Person) :-
+    parent(Person, Parent),
+    sibling(Parent, UncleOrAunt),
+    parent(Cousin, UncleOrAunt).
+
+% All siblings
+all_siblings(Person, SiblingsList) :-
+    findall(Sibling, sibling(Person, Sibling), Siblings),
+    exclude(==(Person), Siblings, SiblingsList).
