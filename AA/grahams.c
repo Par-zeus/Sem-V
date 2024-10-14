@@ -37,12 +37,12 @@ void insertionSort(struct Point points[], int n) {
 // Function to perform the Graham Scan algorithm
 int grahamScan(struct Point points[], int n, struct Point hull[]) {
     // Sort points using insertion sort
-    insertionSort(points, n);
 
     int hullIndex = 0;
-
-    // Build lower hull
+    int lowerSize = hullIndex;
     int i=0;
+    // Build lower hull
+    insertionSort(points, n);
     for (i = 0; i < n; i++) {
         while (hullIndex >= 2 && orientation(hull[hullIndex - 2], hull[hullIndex - 1], points[i]) != 2) {
             hullIndex--;
@@ -50,9 +50,8 @@ int grahamScan(struct Point points[], int n, struct Point hull[]) {
         hull[hullIndex++] = points[i];
     }
 
+    i=n-1;
     // Build upper hull
-    int lowerSize = hullIndex;
-    int i=n-1;
     for ( i = n - 1; i >= 0; i--) {
         while (hullIndex > lowerSize && orientation(hull[hullIndex - 2], hull[hullIndex - 1], points[i]) != 2) {
             hullIndex--;
@@ -75,29 +74,29 @@ void drawHull(struct Point hull[], int n) {
 // Driver function
 int main() {
     // Initialize graphics
-    int gd = DETECT, gm;
-    initgraph(&gd, &gm, "c:\\turboc3\\bgi");
 
-    // Sample points
-    struct Point points[] = {
-        {100, 200}, {200, 300}, {300, 250}, {150, 100}, {400, 150},
-        {350, 350}, {250, 400}, {50, 50}, {450, 50}, {200, 200}
+     struct Point hull[100];
+	struct Point points[] = {
+	{100, 200}, {200, 300}, {300, 250}, {150, 100}, {400, 150},
+	{350, 350}, {250, 400}, {50, 50}, {450, 50}, {200, 200}
     };
+    int gd = DETECT, gm;
     int n = sizeof(points) / sizeof(points[0]);
-
-    // Draw points
     int i=0;
-    for (i = 0; i < n; i++) {
-        putpixel(points[i].x, points[i].y, WHITE);
-    }
-
-    // Array to hold the convex hull points
-    struct Point hull[100]; // Ensure sufficient size for hull
-
-    // Compute the convex hull
+    // Ensure sufficient size for hull
     int hullSize = grahamScan(points, n, hull);
 
-    // Visualize the convex hull
+
+    // Sample points
+
+    initgraph(&gd, &gm, "c:\\turboc3\\bgi");
+
+    // Draw points
+    for (i = 0; i < n; i++) {
+	putpixel(points[i].x, points[i].y, WHITE);
+    }
+
+    
     drawHull(hull, hullSize);
 
     // Wait for a key press
