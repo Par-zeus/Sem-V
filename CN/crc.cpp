@@ -1,72 +1,133 @@
-#include <bits/stdc++.h>
-using namespace std;
-#define N strlen(gen_poly)
-char data[28];
-char check_value[28];
-char gen_poly[10];
-int data_len, i, j;
 
-void XOR() {
-    for (j = 1; j < N; j++)
-        check_value[j] = (check_value[j] == gen_poly[j]) ? '0' : '1';
+#include <stdio.h>
+
+void crcProcess(int n, int l, int g[], int d[], int codeword[])
+{
+
+    int key[n + 1], m, k;
+
+    for (int i = 0; i <= n; i++)
+    {
+        key[i] = d[i];
+    }
+
+    for (int i = 0; i < l; i++)
+    {
+        m = 0;
+        k = key[0];
+
+        for (int j = 1; j <= n; j++)
+        {
+            if (k == 0)
+            {
+                if (key[j] == 0)
+                {
+                    key[m] = 0;
+                }
+                else
+                {
+                    key[m] = 1;
+                }
+            }
+            else
+            {
+                if (key[j] == g[j])
+                {
+                    key[m] = 0;
+                }
+                else
+                {
+                    key[m] = 1;
+                }
+            }
+            m++;
+        }
+        key[m] = d[i + n + 1];
+        codeword[i] = d[i];
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        codeword[l + i] = key[i];
+    }
 }
 
-void crc() {
-    for (i = 0; i < N; i++)
-        check_value[i] = data[i];
+int main()
+{
+    int n;
+    printf("Enter the highest degree of G(x) : ");
+    scanf("%d", &n);
 
-    do {
-        if (check_value[0] == '1')
-            XOR();
+    int g[n];
+    for (int i = 0; i <= n; i++)
+    {
+        printf("Enter the coefficient of x^%d : ", n - i);
+        scanf("%d", &g[i]);
+    }
 
-        for (j = 0; j < N - 1; j++)
-            check_value[j] = check_value[j + 1];
+    int l;
+    printf("\nEnter the length of original data : ");
+    scanf("%d", &l);
+    int d[l + n];
 
-        check_value[j] = data[i++];
-    } while (i <= data_len + N - 1);
-}
+    printf("Enter the original data: \n");
+    for (int i = 0; i < l; i++)
+    {
+        printf("Enter the bit %d: ", i + 1);
+        scanf("%d", &d[i]);
+    }
+    for (int i = 0; i < n; i++)
+    {
+        d[l + i] = 0;
+    }
 
-void receiver() {
-    cout << "Enter the received data: ";
-    cin >> data;
+    int codeword[l + n];
 
-  
-    cout << "Data received: " << data;
-    crc();
+    crcProcess(n, l, g, d, codeword);
 
-    for (i = 0; (i < N - 1) && (check_value[i] != '1'); i++);
+    printf("\nGenerator : ");
+    for (int i = 0; i <= n; i++)
+    {
+        printf("%d", g[i]);
+    }
 
-    if (i < N - 1)
-        cout << "\nError detected\n\n";
-    else
-        cout << "\nNo error detected\n\n";
-}
+    printf("\n\nData : ");
+    for (int i = 0; i < l; i++)
+    {
+        printf("%d", d[i]);
+    }
 
-int main() {
-    cout << "\nEnter data to be transmitted: ";
-    cin >> data;
+    printf("\n\nRemainder : ");
+    for (int i = l; i < l + n; i++)
+    {
+        printf("%d", codeword[i]);
+    }
 
-    cout << "\nEnter the Generating polynomial: ";
-    cin >> gen_poly;
+    printf("\n\nCodeword : ");
+    for (int i = 0; i < l + n; i++)
+    {
+        printf("%d", codeword[i]);
+    }
 
-    data_len = strlen(data);
+    // crcProcess(n,l,g,codeword,codeword);
 
-    for (i = data_len; i < data_len + N - 1; i++)
-        data[i] = '0';
+    // for(int i=l;i<l+n;i++){
+    //     if(!codeword[i]==0){
+    //        error=1;
+    //     }
+    // }
 
-    cout << "\nData padded with n-1 zeros: " << data;
-
-    crc();
-
-    cout << "\nCRC : " << check_value;
-
-    for (i = data_len; i < data_len + N - 1; i++)
-        data[i] = check_value[i - data_len];
-
-    cout << "\n Data sent: " << data;
-
-    receiver();
+    // if(error){
+    //     printf("\nError!");
+    // }
+    // else{
+    //       printf("\nRemainder at receiving side : ");
+    //       for(int i=l;i<l+n;i++){
+    //       printf("%d",codeword[i]);
+    //       }
+    //       printf("\n");
+    //       printf("\nReceived successfully");
+    //  }
 
     return 0;
 }
-
